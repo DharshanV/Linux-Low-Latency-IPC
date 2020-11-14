@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Messenger",
+            "name": "Debug Reader",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}/Debug/messenger",
+            "program": "${workspaceFolder}/Debug/reader",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -25,10 +25,10 @@
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
-            "name": "Debug Receiver",
+            "name": "Debug Writer",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}/Debug/receiver",
+            "program": "${workspaceFolder}/Debug/writer",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

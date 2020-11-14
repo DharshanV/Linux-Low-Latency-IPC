@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 project(Quantiq)
 
-add_executable(messenger Messenger/messenger.cpp messengerMain.cpp)
+file(GLOB writerSRC "Writer/*.h" "Writer/*.cpp")
+file(GLOB readerSRC "Reader/*.h" "Reader/*.cpp")
 
-add_executable(receiver Receiver/receiver.cpp receiverMain.cpp)
+add_executable(writer ${writerSRC})
+add_executable(reader ${readerSRC})

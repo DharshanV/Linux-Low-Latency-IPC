@@ -1,6 +1,6 @@
 #include <iostream>
 
-class Receiver{
+class Reader{
 public:
     void hello();
 };

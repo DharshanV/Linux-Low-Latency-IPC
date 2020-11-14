@@ -1,9 +1,9 @@
 #include <iostream>
-#include "message.h"
+#include "../Message/message.h"
 
 using namespace std;
 
-class Messenger {
+class Writer {
 public:
     bool sendMessage(Message* message);
 };

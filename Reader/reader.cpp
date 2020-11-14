@@ -1,5 +1,5 @@
-#include "receiver.h"
+#include "reader.h"
 
-void Receiver::hello(){
+void Reader::hello(){
     std::cout<<"Hello from receiver"<<std::endl;
 }
