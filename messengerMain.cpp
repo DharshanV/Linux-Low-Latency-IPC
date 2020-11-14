@@ -3,7 +3,9 @@
 using namespace std;
 
 int main(){
+    Message myMessage;
+    
     Messenger messenger;
-    messenger.hello();
+    messenger.sendMessage(&myMessage);
     return 0;
 }

@@ -1,5 +1,5 @@
 #include "messenger.h"
 
-void Messenger::hello(){
-    std::cout<<"Hello from messenger"<<std::endl;
+bool Messenger::sendMessage(Message* message){
+    return true;
 }
