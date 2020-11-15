@@ -1,30 +1,38 @@
 #include <iostream>
 #include <chrono>
-#include "reader.h"
-using namespace std;
+#include <signal.h>
+#include <iomanip>
 
-uint64_t timeSinceEpoc(){
-    return chrono::duration_cast<chrono::milliseconds>
-        (chrono::system_clock::now().time_since_epoch()).count();
-}
+#include "reader.h"
+#include "../Utils/utils.h"
+using namespace std;
 
 #define MAX_COUNT 5
 
+static volatile bool running = true;
+void exitHandler(int dummy) {
+    running = false;
+}
+
 int main(){
+    signal(SIGINT, exitHandler);
+
     Message message;
     Reader reader;
+    uint64_t messageCount = 0;
+    uint64_t totalLatency = 0;
 
-    int count[MAX_COUNT];
-    for(int i=0;i<MAX_COUNT;i++)count[i] = -1;
-
-    while (1)
+    while (running)
     {
         if(reader.read(&message)){
             uint64_t time = timeSinceEpoc();
-            count[time - message.send_t]++;
-            if(message.payload[0] == 'q') break;
+            totalLatency += (time - message.send_t);
+            messageCount++;
         }
     }
-    for(int i=0;i<MAX_COUNT;i++) cout<<i<<": "<<count[i]+1<<endl;
+
+    cout<<"\nMessaged recived: "<<messageCount<<endl;
+    cout << fixed << setprecision(5);
+    cout<<"Average Latency: "<< (totalLatency/(double)messageCount) <<endl;
     return 0;
 }

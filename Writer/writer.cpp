@@ -3,7 +3,7 @@
 Writer::Writer(key_t key) {
     this->key = key;
     this->msgid = msgget(key, 0666 | IPC_CREAT);
-    cout<<"Created Message Write Queue with ID: "<<msgid<<endl;
+    cout<<"Message Queue ID: "<<msgid<<endl;
 }
 
 bool Writer::sendMessage(Message* message){
@@ -12,6 +12,5 @@ bool Writer::sendMessage(Message* message){
 }
 
 Writer::~Writer() {
-    cout<<"Deleting Message Queue"<<endl;
     msgctl(msgid,IPC_RMID,nullptr);
 }

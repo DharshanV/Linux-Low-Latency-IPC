@@ -3,7 +3,7 @@
 Reader::Reader(key_t key){
     this->key = key;
     this->msgid = msgget(key, 0666 | IPC_CREAT);
-    cout<<"Created Message Read Queue with ID: "<<msgid<<endl;
+    cout<<"Message Queue ID: "<<msgid<<endl;
 }
 
 bool Reader::read(Message* message){

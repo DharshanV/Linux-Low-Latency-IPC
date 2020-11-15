@@ -1,29 +1,23 @@
 #include <iostream>
 #include <chrono>
+
 #include "writer.h"
+#include "../Utils/utils.h"
 using namespace std;
 
-#define MAX_RUN 10000000
-
-uint64_t timeSinceEpoc(){
-    return chrono::duration_cast<chrono::milliseconds>
-        (chrono::system_clock::now().time_since_epoch()).count();
-}
+#define MAX_RUN 1000000
 
 int main(){
     Message myMessage;
     Writer writer;
-    cin.get();
+
+    cout<<"Enter to start: "; cin.get();
     #pragma omp parallel for
-    myMessage.payload[0] = 'r';
     for(uint i=0;i<MAX_RUN;i++){
         myMessage.send_t = timeSinceEpoc();
-        if(i+1 == MAX_RUN){
-            myMessage.payload[0] = 'q';
-        }
         writer.sendMessage(&myMessage);
     }
-    cin.get();
+    cout<<"Sent "<<MAX_RUN<<" messages"<<endl;
     return 0;
 }
 
