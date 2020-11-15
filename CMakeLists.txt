@@ -7,3 +7,6 @@ file(GLOB readerSRC "Reader/*.h" "Reader/*.cpp")
 
 add_executable(writer ${writerSRC})
 add_executable(reader ${readerSRC})
+
+target_link_libraries(writer rt)
+target_link_libraries(reader rt)
