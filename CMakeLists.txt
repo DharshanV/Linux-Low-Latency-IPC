@@ -4,11 +4,16 @@ project(Quantiq)
 
 find_package(Threads REQUIRED)
 
-file(GLOB writerSRC "Writer/*.h" "Writer/*.cpp")
-file(GLOB readerSRC "Reader/*.h" "Reader/*.cpp")
+# Queue
+add_executable(writerQueue Writer/WriterQueue.cpp)
+add_executable(readerQueue Reader/ReaderQueue.cpp)
 
-add_executable(writer ${writerSRC})
-add_executable(reader ${readerSRC})
+target_link_libraries(writerQueue rt Threads::Threads)
+target_link_libraries(readerQueue rt Threads::Threads)
 
-target_link_libraries(writer rt Threads::Threads)
-target_link_libraries(reader rt Threads::Threads)
+# Memory
+add_executable(writerMemory Writer/WriterMemory.cpp)
+add_executable(readerMemory Reader/ReaderMemory.cpp)
+
+target_link_libraries(writerMemory rt Threads::Threads)
+target_link_libraries(readerMemory rt Threads::Threads)

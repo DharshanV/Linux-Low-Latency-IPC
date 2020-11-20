@@ -15,8 +15,7 @@ public:
     }
 
     void write(Message* message){
-        mq_send(mq,(const char*)message,sizeof(*message),0);
-        //check(mq_send(mq,(const char*)message,sizeof(*message),0) > 0,"sending");
+        check(mq_send(mq,(const char*)message,sizeof(*message),0) > 0,"sending");
     }
 private:
     mqd_t mq;
