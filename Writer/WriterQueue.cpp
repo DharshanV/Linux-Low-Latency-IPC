@@ -54,7 +54,7 @@ int main(){
         writer.write(&message);
         count++;
     }
-    cout<<"Sent "<<count<<endl;
+    cout<<"\nSent "<<count<<endl;
     return 0;
 }
 #endif

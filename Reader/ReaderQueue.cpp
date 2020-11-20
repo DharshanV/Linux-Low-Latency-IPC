@@ -67,7 +67,7 @@ int main(){
             count++;
         }
     }
-    cout<<"Average Latency: "<<latency/(double)count<<endl;
+    cout<<"\nAverage Latency: "<<latency/(double)count<<endl;
     cout<<"Count: "<<count<<endl;
     return 0;
 }

@@ -24,15 +24,33 @@ public:
     }
 
     bool read(Message* message){
-        if(atomic_load(&sharedMessage->state) == 3) {
-            cout<<"writer exited"<<endl;
+        //Lock till read state
+        int state = getState();
+        while(state != 2){
+            if(state == 3) return false;
+            state = getState();
         }
-        while(atomic_load(&sharedMessage->state) != 2){}
+        //Read data
         memcpy(message->payload,sharedMessage->message.payload,sizeof(Message::payload));
         message->send_t = sharedMessage->message.send_t;
-        atomic_store(&sharedMessage->state,1);
+
+        //Tell writer to write
+        setState(1);
         return true;
     }
+
+    char getState(){
+        return atomic_load(&sharedMessage->state);
+    }
+
+    void setState(char value){
+        atomic_store(&sharedMessage->state,value);
+    }
+
+    ~ReaderMemory(){
+        shm_unlink(memoryName.c_str());
+    }
+    
 private:
     string memoryName;
     int shmID;

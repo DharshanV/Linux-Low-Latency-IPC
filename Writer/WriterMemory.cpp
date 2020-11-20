@@ -11,19 +11,18 @@ bool running(true);
 
 void exitHandler(int dummy) {
     running = false;
-    writer.state(3);
+    writer.setState(3);
 }
 
 int main(){
     signal(SIGINT, exitHandler);
     uint64_t count = 0;
     while(running) {
-        cout<<": ";
-        cin.getline(message.payload,112);
         message.send_t = timeSinceEpoc();
-        writer.write(&message);
-        count++;
+        if(writer.write(&message)){
+            count++;
+        }
     }
-    cout<<"\nSent "<<count<<endl;
+    cout<<"\nSent: "<<count<<endl;
     return 0;
 }

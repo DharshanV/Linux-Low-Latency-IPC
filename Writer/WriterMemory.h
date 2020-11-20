@@ -21,25 +21,37 @@ public:
         ftruncate(shmID,sizeof(struct SharedMessage));
         sharedMessage = (SharedMessage*)mmap(0,sizeof(struct SharedMessage),
                         PROT_READ | PROT_WRITE,MAP_SHARED,shmID,0);
-        atomic_store(&sharedMessage->state,1);
+        setState(1);
     }
 
-    void write(Message* message){
-        if(atomic_load(&sharedMessage->state) == 3) return;
-        while(atomic_load(&sharedMessage->state) != 1){}
+    bool write(Message* message){
+        //Lock till write state
+        char state = getState();
+        while(state != 1){
+            //exit state
+            if(state == 3) return false;
+            state = getState();
+        }
+        // Write data
         memcpy(sharedMessage->message.payload,message->payload,sizeof(Message::payload));
         sharedMessage->message.send_t = message->send_t;
-        atomic_store(&sharedMessage->state,2);
+
+        // Tell reader to read
+        setState(2);
+        return true;
     }
 
-    void state(int value){
+    char getState(){
+        return atomic_load(&sharedMessage->state);
+    }
+
+    void setState(char value){
         atomic_store(&sharedMessage->state,value);
     }
 
     ~WriterMemory(){
         munmap(sharedMessage,sizeof(struct SharedMessage));
         close(shmID);
-        shm_unlink(memoryName.c_str());
     }
 
 private:

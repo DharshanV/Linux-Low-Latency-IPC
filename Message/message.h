@@ -7,6 +7,6 @@ struct Message {
 };
 
 struct SharedMessage{
-    std::atomic_int state;
+    std::atomic_char state;
     Message message;
 };
