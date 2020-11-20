@@ -1,37 +1,60 @@
-#include <iostream>
-#include <chrono>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <mqueue.h>
+#include <signal.h>
+#include <unistd.h>
+#include <thread>
+#include <atomic>
 
-#include "writer.h"
-#include "../Utils/utils.h"
+#include "WriterQueue.h"
+
 using namespace std;
 
-#define MAX_RUN 1000000
+Message message;
+WriterQueue writer(QUEUE_NAME);
+atomic_bool running(true);
+atomic_uint64_t count(0);
 
-int main(){
-    Message myMessage;
-    Writer writer;
+void exitHandler(int dummy) {
+    running = false;
+}
 
-    cout<<"Enter to start: "; cin.get();
-    #pragma omp parallel for
-    for(uint i=0;i<MAX_RUN;i++){
-        myMessage.send_t = timeSinceEpoc();
-        writer.sendMessage(&myMessage);
+#if RUN_MULTITHREADED
+void queueWriter(WriterQueue* writer){
+    while (running)
+    {
+        message.send_t = timeSinceEpoc();
+        writer->write(&message);
+        count++;
     }
-    cout<<"Sent "<<MAX_RUN<<" messages"<<endl;
+}
+
+/* multi threaded */
+int main(){
+    signal(SIGINT, exitHandler);
+
+    thread threads[4];
+
+    for(thread& t : threads){
+        t = thread(queueWriter,&writer);
+    }
+    for(thread& t : threads){
+        t.join();
+    }
+    cout<<"Sent "<<count<<endl;
+}
+#else
+/* single threaded */
+int main(){
+    signal(SIGINT, exitHandler);
+    uint64_t count = 0;
+    for(;running;) {
+        message.send_t = timeSinceEpoc();
+        writer.write(&message);
+        count++;
+    }
+    cout<<"Sent "<<count<<endl;
     return 0;
 }
-
-/*
-http://beej.us/guide/bgipc/html/single/bgipc.html#shm
-1. First do message queue (easy and simple) and kinda slow
-2. Use Shared Memory. Fastest method but I need to handle
-    cocurrency using Semaphores.
-
-while (1)
-{
-    cout<<": ";
-    cin>>myMessage.payload;
-    if(myMessage.payload[0] == 'q') break;
-    writer.sendMessage(&myMessage);
-}
-*/
+#endif
