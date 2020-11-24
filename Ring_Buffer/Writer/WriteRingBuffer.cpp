@@ -16,6 +16,7 @@ void exitHandler(int dummy) {
 }
 
 int main(int argc, char* argv[]){
+    srand(time(0));
     signal(SIGINT, exitHandler);
 
     cout<<"Enter to start...";

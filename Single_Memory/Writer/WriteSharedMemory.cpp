@@ -18,7 +18,7 @@ int main(){
     signal(SIGINT, exitHandler);
     uint64_t count = 0;
     cin.get();
-    while(running) {
+    for(;running;) {
         message.send_t = timeSinceEpoc();
         if(writer.write(message)){
             count++;

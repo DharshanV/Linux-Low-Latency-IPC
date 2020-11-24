@@ -13,8 +13,7 @@ using namespace std;
 
 Message message;
 WriterQueue writer(QUEUE_NAME);
-atomic_bool running(true);
-atomic_uint64_t count(0);
+bool running(true);
 
 void exitHandler(int dummy) {
     running = false;
