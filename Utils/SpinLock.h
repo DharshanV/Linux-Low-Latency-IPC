@@ -21,8 +21,10 @@ public:
         while(true){
             if(!myLock->exchange(true)) return;
             do{
-                // int backOffCount = random(4,1024);
-                // for(int i=0;i<backOffCount;i++) _mm_pause();
+                #if RING_BUFFER_MULTITHREAD
+                    int backOffCount = random(8,1024);
+                    for(int i=0;i<backOffCount;i++);
+                #endif
             } while(myLock->load());
         }
     }
