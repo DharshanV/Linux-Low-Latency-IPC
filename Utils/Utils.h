@@ -3,7 +3,8 @@
 
 #define RUN_MULTITHREADED 0
 #define QUEUE_NAME "/Message_Queue"
-#define MEMORY_NAME "/Shared_Memory"
+#define SHARED_MEMORY "/Shared_Memory"
+#define RING_BUFFER "/RingBuffer5"
 
 void check(bool valid,std::string m){
     if(valid){

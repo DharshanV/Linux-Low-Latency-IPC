@@ -1,25 +1,30 @@
 #include <iostream>
 #include <signal.h>
+#include <thread>
 
-#include "WriterMemory.h"
+#include "RingBufferWriter.h"
 
 using namespace std;
 
 Message message;
-WriterMemory writer(MEMORY_NAME);
+RingBufferWriter writer(RING_BUFFER);
 bool running(true);
 
 void exitHandler(int dummy) {
     running = false;
-    writer.setState(3);
+    writer.stopWriting();
 }
 
-int main(){
+int main(int argc, char* argv[]){
     signal(SIGINT, exitHandler);
+
+    cout<<"Enter to start...";
+    cin.get();
+
     uint64_t count = 0;
     while(running) {
         message.send_t = timeSinceEpoc();
-        if(writer.write(&message)){
+        if(writer.write(message)){
             count++;
         }
     }

@@ -8,7 +8,7 @@
             "name": "Debug Reader",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/Debug/reader",
+            "program": "${workspaceFolder}/Debug/readerQueue",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

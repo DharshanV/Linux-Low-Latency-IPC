@@ -5,14 +5,14 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "../Utils/utils.h"
-#include "../Message/message.h"
+#include "../../Utils/Utils.h"
+#include "../../Message/Message.h"
 
 using namespace std;
 
-class ReaderMemory{
+class SharedMemoryReader {
 public:
-    ReaderMemory(string memoryName){
+    SharedMemoryReader(string memoryName){
         this->memoryName = memoryName;
 
         shmID = shm_open(memoryName.c_str(), O_RDWR, 0666);
@@ -23,7 +23,7 @@ public:
                         PROT_READ | PROT_WRITE,MAP_SHARED,shmID,0);
     }
 
-    bool read(Message* message){
+    bool read(Message& message){
         //Lock till read state
         int state = getState();
         while(state != 2){
@@ -31,8 +31,7 @@ public:
             state = getState();
         }
         //Read data
-        memcpy(message->payload,sharedMessage->message.payload,sizeof(Message::payload));
-        message->send_t = sharedMessage->message.send_t;
+        message = sharedMessage->message;
 
         //Tell writer to write
         setState(1);
@@ -47,7 +46,7 @@ public:
         atomic_store(&sharedMessage->state,value);
     }
 
-    ~ReaderMemory(){
+    ~SharedMemoryReader(){
         shm_unlink(memoryName.c_str());
     }
     

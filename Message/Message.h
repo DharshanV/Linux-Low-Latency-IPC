@@ -10,3 +10,11 @@ struct SharedMessage{
     std::atomic_char state;
     Message message;
 };
+
+#define MAX_SIZE 1 << 4
+struct RingBuffer {
+    std::atomic_bool locked{false};
+    uint64_t curWriteNum;
+    uint64_t curReadNum;
+    Message message[MAX_SIZE];
+};
