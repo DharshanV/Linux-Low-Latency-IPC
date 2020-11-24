@@ -14,8 +14,9 @@ public:
         check(mq_close(mq) == -1,"closing");
     }
 
-    void write(Message* message){
-        check(mq_send(mq,(const char*)message,sizeof(*message),0) > 0,"sending");
+    bool write(Message* message){
+        int valid = mq_send(mq,(const char*)message,sizeof(*message),0);
+        return valid == 0;
     }
 private:
     mqd_t mq;

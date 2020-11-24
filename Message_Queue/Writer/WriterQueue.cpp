@@ -20,13 +20,18 @@ void exitHandler(int dummy) {
 }
 
 #if RUN_MULTITHREADED
+atomic_uint64_t count(0);
+
 void queueWriter(WriterQueue* writer){
+    uint64_t localCount =0;
     while (running)
     {
         message.send_t = timeSinceEpoc();
-        writer->write(&message);
-        count++;
+        if(writer->write(&message)){
+            localCount++;
+        }
     }
+    count += localCount;
 }
 
 /* multi threaded */
@@ -41,7 +46,7 @@ int main(){
     for(thread& t : threads){
         t.join();
     }
-    cout<<"Sent "<<count<<endl;
+    cout<<"\nSent "<<count<<endl;
 }
 #else
 /* single threaded */

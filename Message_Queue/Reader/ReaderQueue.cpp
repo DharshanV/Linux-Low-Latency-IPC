@@ -15,7 +15,7 @@
 using namespace std;
 
 Message message;
-ReadQueue reader(QUEUE_NAME,10,sizeof(message));
+ReadQueue reader(QUEUE_NAME,40,sizeof(message));
 atomic_bool running(true);
 mutex outputLock;
 
@@ -24,21 +24,21 @@ void exitHandler(int dummy) {
 }
 
 #if RUN_MULTITHREADED
+atomic_uint64_t latency(0);
+atomic_uint64_t count(0);
+
 void receive (ReadQueue* reader){
-    uint64_t latency = 0;
-    uint64_t count = 0;
+    uint64_t localLatency = 0;
+    uint64_t localCount = 0;
     while (running)
     {
         if(reader->reciveMessage(&message)){
-            latency += (timeSinceEpoc() - message.send_t);
-            count++;
+            localLatency += (timeSinceEpoc() - message.send_t);
+            localCount++;
         }
     }
-    outputLock.lock();
-    cout<<"Thread "<<this_thread::get_id()<<endl;
-    cout<<"Mean Latency: "<<latency/(double)count<<endl;
-    cout<<"Count: "<<count<<endl;
-    outputLock.unlock();
+    latency += localLatency;
+    count += localCount;
 }
 
 /* multi threaded */
@@ -51,6 +51,8 @@ int main(){
     for(thread& t : threads){
         t.join();
     }
+    cout<<"\nLatency: "<<latency/(double)count<<endl;
+    cout<<"Count: "<<count<<endl;
     return 0;
 }
 #else

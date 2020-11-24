@@ -1,7 +1,7 @@
 #include <iostream>
 #include <chrono>
 
-#define RUN_MULTITHREADED 0
+#define RUN_MULTITHREADED 1
 #define RING_BUFFER_MULTITHREAD 0
 #define NUM_THREADS 4
 #define QUEUE_NAME "/Message_Queue"
