@@ -1,9 +1,7 @@
 #include <iostream>
 #include <sys/mman.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <string.h>
 
 #include "../../Utils/Utils.h"
 #include "../../Utils/SpinLock.h"
@@ -17,21 +15,19 @@ public:
         this->memoryName = memoryName;
         doRead = true;
 
-        shmID = shm_open(memoryName.c_str(), O_RDWR, 0666);
+        shmID = shm_open(memoryName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0600);
         check(shmID < 0, "shm_open");
 
         //Get the shared memeory pointer
         ftruncate(shmID,sizeof(struct RingBuffer));
         ringBuffer = (RingBuffer*)mmap(0,sizeof(struct RingBuffer),
-                        PROT_READ | PROT_WRITE,MAP_SHARED,shmID,0);
+                        PROT_READ | PROT_WRITE, MAP_SHARED,shmID,0);
         spinLock = SpinLock(&ringBuffer->locked);
     }
 
     bool read(Message& message){
         if(!doRead){
-            if(spinLock.isLocked()){
-                spinLock.unlock();
-            }
+            if(spinLock.isLocked()){ spinLock.unlock(); }
             return false;
         }
 

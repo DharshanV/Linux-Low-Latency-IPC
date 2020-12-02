@@ -1,9 +1,7 @@
 #include <iostream>
 #include <sys/mman.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <string.h>
 
 #include "../../Utils/Utils.h"
 #include "../../Utils/SpinLock.h"
@@ -17,7 +15,7 @@ public:
         this->memoryName = memoryName;
         doWrite = true;
 
-        shmID = shm_open(memoryName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0600);
+        shmID = shm_open(memoryName.c_str(), O_RDWR, 0666);
         check(shmID < 0, "shm_open");
 
         //Create and get the shared memeory pointer

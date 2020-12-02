@@ -1,6 +1,7 @@
 #include <iostream>
 #include <signal.h>
 #include <thread>
+#include <vector>
 
 #include "RingBufferReader.h"
 
@@ -9,15 +10,15 @@ using namespace std;
 Message message;
 RingBufferReader reader(RING_BUFFER);
 atomic_bool running(true);
+uint32_t threadCount = 0;
 
-void exitHandler(int dummy) {
+atomic_uint64_t latency(0);
+atomic_uint64_t count(0);
+
+void exitHandler(int) {
     running = false;
     reader.stopReading();
 }
-
-#if RING_BUFFER_MULTITHREAD
-atomic_uint64_t latency(0);
-atomic_uint64_t count(0);
 
 void readThread(){
     uint64_t localLatency = 0;
@@ -37,35 +38,27 @@ int main(int argc, char* argv[]){
     srand(time(0));
     signal(SIGINT, exitHandler);
 
-    thread threads[NUM_THREADS];
+    if(argc != 2) { cout<<"Invalid argc"<<endl; return 0; }
+
+    try { 
+        threadCount = stoi(argv[1]);
+        if(threadCount <= 0) throw exception();
+    }
+    catch(exception e) {
+        cout<<"Invalid thread count"<<endl; return 0;
+    }
+
+    cout<<"Reading started..."<<endl;
+
+    vector<thread> threads(threadCount);
     for(thread& t : threads){
         t = thread(readThread);
     }
     for(thread& t : threads){
         t.join();
     }
-    cout<<"\nAverage Latency: "<<latency/(double)count<<endl;
-    cout<<"Recived: "<<count<<endl;
+
+    cout<<"\nRecived: "<<count<<endl;
+    cout<<"Average Latency: "<<latency/(double)count<<endl;
     return 0;
 }
-
-#else
-int main(int argc, char* argv[]){
-    srand(time(0));
-    signal(SIGINT, exitHandler);
-
-    uint64_t latency(0);
-    uint64_t count(0);
-
-    while (running)
-    {
-        if(reader.read(message)) {
-            latency += (timeSinceEpoc() - message.send_t);
-            count++;
-        }
-    }
-    cout<<"\nAverage Latency: "<<latency/(double)count<<endl;
-    cout<<"Recived: "<<count<<endl;
-    return 0;
-}
-#endif
