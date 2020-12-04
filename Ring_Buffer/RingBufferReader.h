@@ -3,15 +3,18 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "../../Utils/Utils.h"
-#include "../../Utils/SpinLock.h"
-#include "../../Message/Message.h"
+#include "../Utils/Utils.h"
+#include "../Utils/SpinLock.h"
+#include "../Message/Message.h"
 
 using namespace std;
 
 class RingBufferReader {
 public:
+    RingBufferReader() { }
+    
     RingBufferReader(string memoryName){
+        shm_unlink(memoryName.c_str());
         this->memoryName = memoryName;
         doRead = true;
 
@@ -19,10 +22,20 @@ public:
         check(shmID < 0, "shm_open");
 
         //Get the shared memeory pointer
-        ftruncate(shmID,sizeof(struct RingBuffer));
-        ringBuffer = (RingBuffer*)mmap(0,sizeof(struct RingBuffer),
+        ftruncate(shmID,sizeof(struct MessageBuffer));
+        ringBuffer = (MessageBuffer*)mmap(0,sizeof(struct MessageBuffer),
                         PROT_READ | PROT_WRITE, MAP_SHARED,shmID,0);
         spinLock = SpinLock(&ringBuffer->locked);
+    }
+
+    RingBufferReader& operator=(const RingBufferReader& other) {
+        shmID = other.shmID;
+        doRead = other.doRead;
+        memoryName = other.memoryName;
+        messagePtr = other.messagePtr;
+        ringBuffer = other.ringBuffer;
+        spinLock = other.spinLock;
+        return *this;
     }
 
     bool read(Message& message){
@@ -47,7 +60,7 @@ public:
     }
 
     ~RingBufferReader(){
-        munmap(ringBuffer,sizeof(struct RingBuffer));
+        munmap(ringBuffer,sizeof(struct MessageBuffer));
         close(shmID);
         shm_unlink(memoryName.c_str());
     }
@@ -57,7 +70,7 @@ private:
     bool doRead;
     string memoryName;
     SpinLock spinLock;
-    struct RingBuffer* ringBuffer;
+    struct MessageBuffer* ringBuffer;
     struct Message* messagePtr;
-    const uint64_t MASK = (MAX_SIZE) - 1;
+    const uint64_t MASK = (MAX_BUFFER_SIZE) - 1;
 };

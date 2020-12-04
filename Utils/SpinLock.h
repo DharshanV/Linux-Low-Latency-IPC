@@ -1,6 +1,6 @@
+#ifndef SPINLOCK_H
+#define SPINLOCK_H
 #include <atomic>
-#include <iostream>
-#include <emmintrin.h>
 
 class SpinLock{
 public:
@@ -12,7 +12,7 @@ public:
         myLock = lock;
     }
 
-    SpinLock& operator=(SpinLock other){
+    SpinLock& operator=(const SpinLock& other){
         this->myLock = other.myLock;
         return *this;
     }
@@ -21,7 +21,7 @@ public:
         while(true){
             if(!myLock->exchange(true)) return;
             do{
-                int backOffCount = random(1,100);
+                int backOffCount = random(1,1024);
                 for(int i=0;i<backOffCount;i++);
             } while(myLock->load());
         }
@@ -42,3 +42,4 @@ public:
 private:
     std::atomic_bool* myLock;
 };
+#endif

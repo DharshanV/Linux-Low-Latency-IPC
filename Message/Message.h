@@ -1,3 +1,5 @@
+#ifndef MESSAGE_H
+#define MESSAGE_H
 #include <atomic>
 
 struct Message {
@@ -6,15 +8,12 @@ struct Message {
     char payload[112];
 };
 
-struct SharedMessage{
-    std::atomic_char state;
-    Message message;
-};
-
-#define MAX_SIZE 1 << 4
-struct RingBuffer {
+#define BUFFER_NAME "/RingBuffer"
+#define MAX_BUFFER_SIZE 1 << 4
+struct MessageBuffer {
     std::atomic_bool locked{false};
     uint64_t curWriteNum;
     uint64_t curReadNum;
-    Message message[MAX_SIZE];
+    Message message[MAX_BUFFER_SIZE];
 };
+#endif

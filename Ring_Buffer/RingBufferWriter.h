@@ -3,14 +3,16 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "../../Utils/Utils.h"
-#include "../../Utils/SpinLock.h"
-#include "../../Message/Message.h"
+#include "../Utils/Utils.h"
+#include "../Utils/SpinLock.h"
+#include "../Message/Message.h"
 
 using namespace std;
 
 class RingBufferWriter {
 public:
+    RingBufferWriter() { }
+    
     RingBufferWriter(string memoryName){
         this->memoryName = memoryName;
         doWrite = true;
@@ -19,10 +21,20 @@ public:
         check(shmID < 0, "shm_open");
 
         //Create and get the shared memeory pointer
-        ftruncate(shmID,sizeof(struct RingBuffer));
-        ringBuffer = (RingBuffer*)mmap(0,sizeof(struct RingBuffer),
+        ftruncate(shmID,sizeof(struct MessageBuffer));
+        ringBuffer = (MessageBuffer*)mmap(0,sizeof(struct MessageBuffer),
                         PROT_READ | PROT_WRITE,MAP_SHARED,shmID,0);
         spinLock = SpinLock(&ringBuffer->locked);
+    }
+
+    RingBufferWriter& operator=(const RingBufferWriter& other){
+        shmID = other.shmID;
+        doWrite = other.doWrite;
+        memoryName = other.memoryName;
+        messagePtr = other.messagePtr;
+        ringBuffer = other.ringBuffer;
+        spinLock = other.spinLock;
+        return *this;
     }
 
     bool write(Message& message){
@@ -49,7 +61,7 @@ public:
     }
 
     ~RingBufferWriter(){
-        munmap(ringBuffer,sizeof(struct RingBuffer));
+        munmap(ringBuffer,sizeof(struct MessageBuffer));
         close(shmID);
     }
 
@@ -58,7 +70,7 @@ private:
     bool doWrite;
     string memoryName;
     SpinLock spinLock;
-    struct RingBuffer* ringBuffer;
+    struct MessageBuffer* ringBuffer;
     struct Message* messagePtr;
-    const uint64_t MASK = (MAX_SIZE) - 1;
+    const uint64_t MASK = (MAX_BUFFER_SIZE) - 1;
 };

@@ -12,23 +12,16 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 find_package(Threads REQUIRED)
 
-# Queue
-add_executable(queueWriter Message_Queue/Writer/WriterQueue.cpp)
-add_executable(queueReader Message_Queue/Reader/ReaderQueue.cpp)
+# Single Buffer
+add_executable(singleWriter SingleBuffer/writer.cpp)
+add_executable(singleReader SingleBuffer/reader.cpp)
 
-target_link_libraries(queueWriter rt Threads::Threads)
-target_link_libraries(queueReader rt Threads::Threads)
+target_link_libraries(singleWriter rt Threads::Threads)
+target_link_libraries(singleReader rt Threads::Threads)
 
-# Shared Memory
-add_executable(sharedWriter Single_Memory/Writer/WriteSharedMemory.cpp)
-add_executable(sharedReader Single_Memory/Reader/ReadSharedMemory.cpp)
+# Multi Buffer
+add_executable(multiWriter MultiBuffer/writer.cpp)
+add_executable(multiReader MultiBuffer/reader.cpp)
 
-target_link_libraries(sharedWriter rt Threads::Threads)
-target_link_libraries(sharedReader rt Threads::Threads)
-
-# Ring Buffer
-add_executable(ringBufferWriter Ring_Buffer/Writer/WriteRingBuffer.cpp)
-add_executable(ringBufferReader Ring_Buffer/Reader/ReadRingBuffer.cpp)
-
-target_link_libraries(ringBufferWriter rt Threads::Threads)
-target_link_libraries(ringBufferReader rt Threads::Threads)
+target_link_libraries(multiWriter rt Threads::Threads)
+target_link_libraries(multiReader rt Threads::Threads)
