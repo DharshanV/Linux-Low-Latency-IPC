@@ -29,3 +29,6 @@ target_link_libraries(multiReader rt Threads::Threads)
 # Tests
 add_executable(singleTester Tests/singleBufferTest.cpp)
 target_link_libraries(singleTester rt Threads::Threads)
+
+add_executable(multiTester Tests/multiBufferTest.cpp)
+target_link_libraries(multiTester rt Threads::Threads)

@@ -24,6 +24,8 @@ public:
         ftruncate(shmID,sizeof(struct MessageBuffer));
         ringBuffer = (MessageBuffer*)mmap(0,sizeof(struct MessageBuffer),
                         PROT_READ | PROT_WRITE,MAP_SHARED,shmID,0);
+        check(ringBuffer == NULL, "shared memory pointer");
+        
         spinLock = SpinLock(&ringBuffer->locked);
     }
 

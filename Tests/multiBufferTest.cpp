@@ -3,7 +3,7 @@
 #include <thread>
 #include <vector>
 
-#include "../SingleBuffer/SingleBuffer.h"
+#include "../MultiBuffer/MultiBuffer.h"
 
 static uint testCount = 1;
 atomic_bool running(true);
@@ -21,7 +21,7 @@ void nextTest(){
     testCount++;
 }
 
-void readThread(SingleBuffer* reader){
+void readThread(MultiBuffer* reader){
     Message message;
     uint64_t localLatency = 0;
     uint64_t localCount = 0;
@@ -43,17 +43,18 @@ void getSplitSize(vector<uint32_t>& splits,uint64_t maxMessage,uint threadCount)
     for(uint i=0;i<(threadCount-r);i++) splits.push_back(d); 
 }
 
-void writeThread(SingleBuffer* writer, uint64_t maxCount){
+void writeThread(MultiBuffer* writer, uint64_t maxCount){
     Message message;
     uint64_t count = 0;
     while(count < maxCount){
         message.send_t = timeSinceEpoc();
         if(writer->write(message)) count++;
+        this_thread::sleep_for(chrono::nanoseconds(1));
     }
     writeCount += count;
 }
 
-void runInstance(SingleBuffer* reader,SingleBuffer* writer,uint readThreads,uint writeThreads,uint64_t maxMessage){
+void runInstance(MultiBuffer* reader,MultiBuffer* writer,uint readThreads,uint writeThreads,uint64_t maxMessage){
     vector<uint32_t> splits;
     vector<thread> reads(readThreads);
     vector<thread> writes(writeThreads);
@@ -76,8 +77,8 @@ void runInstance(SingleBuffer* reader,SingleBuffer* writer,uint readThreads,uint
 }
 
 void test(uint messageCount,uint readThread,uint writeThread){
-    SingleBuffer reader(false);
-    SingleBuffer writer(true);
+    MultiBuffer reader(false);
+    MultiBuffer writer(true);
     runInstance(&reader,&writer,readThread,writeThread,messageCount);
 
     cout<<"Test "<<testCount<<endl;
@@ -103,7 +104,7 @@ int main(){
     vector<Parameters> testFunctions = 
     {
         //base tests
-        {1000000,1,1},
+        {100,1,1},
         {1000000,3,1},
         {1000000,1,3},
         {1000000,3,3},
