@@ -13,20 +13,23 @@ class RingBufferReader {
 public:
     RingBufferReader() { }
     
-    RingBufferReader(string memoryName){
+    RingBufferReader(string memoryName) {
+        //clean up previous buffer
         shm_unlink(memoryName.c_str());
         this->memoryName = memoryName;
         doRead = true;
 
+        //create shared memory
         shmID = shm_open(memoryName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0600);
         check(shmID < 0, "shm_open");
 
-        //Get the shared memeory pointer
+        //Get the shared memory pointer
         ftruncate(shmID,sizeof(struct MessageBuffer));
         ringBuffer = (MessageBuffer*)mmap(0,sizeof(struct MessageBuffer),
                         PROT_READ | PROT_WRITE, MAP_SHARED,shmID,0);
         check(ringBuffer == NULL, "shared memory pointer");
 
+        //get the Spinlock in the shared memory
         spinLock = SpinLock(&ringBuffer->locked);
     }
 
@@ -46,12 +49,13 @@ public:
             return false;
         }
 
+        //Try to get the lock
         spinLock.lock();
-        if (ringBuffer->curReadNum == ringBuffer->curWriteNum)
-        {
+        if (ringBuffer->curReadNum == ringBuffer->curWriteNum) { //check if full 
             spinLock.unlock();
             return false;
         }
+        //Read the data into message
         message = ringBuffer->message[ringBuffer->curReadNum++ & MASK];
         spinLock.unlock();
         return true;

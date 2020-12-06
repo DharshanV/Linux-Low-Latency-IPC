@@ -38,6 +38,7 @@ void writeThread(uint64_t maxCount){
     while(count < maxCount){
         message.send_t = timeSinceEpoc();
         if(writer.write(message)) count++;
+        this_thread::sleep_for(chrono::nanoseconds(1));
     }
     totalCount += count;
 }

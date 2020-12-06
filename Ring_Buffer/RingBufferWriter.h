@@ -17,6 +17,7 @@ public:
         this->memoryName = memoryName;
         doWrite = true;
 
+        //open the shared memory created by reader
         shmID = shm_open(memoryName.c_str(), O_RDWR, 0666);
         check(shmID < 0, "shm_open");
 
@@ -26,6 +27,7 @@ public:
                         PROT_READ | PROT_WRITE,MAP_SHARED,shmID,0);
         check(ringBuffer == NULL, "shared memory pointer");
         
+        //get the Spinlock for the shared memory
         spinLock = SpinLock(&ringBuffer->locked);
     }
 
@@ -47,12 +49,14 @@ public:
             return false;
         }
 
+        //try to get the lock
         spinLock.lock();
         if (((ringBuffer->curWriteNum+1) & MASK) == (ringBuffer->curReadNum & MASK))
         {
             spinLock.unlock();
             return false;
         }
+        //write the message
         ringBuffer->message[ringBuffer->curWriteNum++ & MASK] = message;
         spinLock.unlock();
         return true;
