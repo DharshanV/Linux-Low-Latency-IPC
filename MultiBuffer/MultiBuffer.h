@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "../Ring_Buffer/RingBufferWriter.h"
-#include "../Ring_Buffer/RingBufferReader.h"
+#include "../RingBuffer/RingBufferWriter.h"
+#include "../RingBuffer/RingBufferReader.h"
 
 using namespace std;
 

@@ -39,10 +39,11 @@ void writeThread(uint64_t maxCount,uint id){
         message.send_t = timeSinceEpoc();
         if(writer.write(message)) {
             count++;
-
+#if DEBUG
             if(count % 10000 == 0) {
                 cout<<"Writer-"<<id<<" writing... "<<count<< endl;
             }
+#endif
         }
         this_thread::sleep_for(chrono::nanoseconds(1));
     }

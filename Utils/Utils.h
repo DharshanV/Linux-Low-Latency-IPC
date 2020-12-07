@@ -2,6 +2,8 @@
 #define UTILS_H
 #include <chrono>
 
+#define DEBUG 1
+
 inline void check(bool valid,std::string m){
     if(valid){
         std::cout<<"Error "<<m<<std::endl;

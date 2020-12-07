@@ -16,7 +16,7 @@ atomic_uint64_t count(0);
 
 void validateArguments(int argc, char* argv[]);
 void exitHandler(int);
-void readThread();
+void readThread(uint id);
 
 int main(int argc, char* argv[]){
     srand(time(0));
@@ -26,8 +26,8 @@ int main(int argc, char* argv[]){
     cout<<"Reading started..."<<endl;
 
     vector<thread> threads(threadCount);
-    for(thread& t : threads){
-        t = thread(readThread);
+    for(uint i = 0;i<threadCount;i++){
+        threads[i] = thread(readThread,i);
     }
     for(thread& t : threads){
         t.join();
@@ -44,7 +44,7 @@ void exitHandler(int) {
     reader.stopReading();
 }
 
-void readThread(){
+void readThread(uint id){
     Message message;
     uint64_t localLatency = 0;
     uint64_t localCount = 0;
@@ -53,6 +53,11 @@ void readThread(){
         if(reader.read(message)) {
             localLatency += (timeSinceEpoc() - message.send_t);
             localCount++;
+#if DEBUG
+            if(localCount % 10000 == 0) {
+                cout<<"Reader-"<<id<<" reading... "<<localCount<< endl;
+            }
+#endif
         }
     }
     latency += localLatency;

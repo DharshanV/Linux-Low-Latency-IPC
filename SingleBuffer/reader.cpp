@@ -54,9 +54,11 @@ void readThread(uint id){
             localLatency += (timeSinceEpoc() - message.send_t);
             localCount++;
 
+#if DEBUG
             if(localCount % 10000 == 0) {
                 cout<<"Reader-"<<id<<" reading... "<<localCount<< endl;
             }
+#endif
         }
     }
     latency += localLatency;
