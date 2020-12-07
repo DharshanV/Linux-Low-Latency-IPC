@@ -13,7 +13,7 @@ SingleBuffer writer(true);
 
 void validateArguments(int argc, char* argv[]);
 void getSplitSize(vector<uint32_t>& splits);
-void writeThread(uint64_t maxCount);
+void writeThread(uint64_t maxCount,uint id);
 
 int main(int argc, char* argv[]){
     srand(time(0));
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]){
 
     vector<thread> threads(threadCount);
     for(uint i=0;i<threadCount; i++){
-        threads[i] = thread(writeThread,splitCount[i]);
+        threads[i] = thread(writeThread,splitCount[i],i);
     }
     for(thread& t : threads) t.join();
 
@@ -32,12 +32,18 @@ int main(int argc, char* argv[]){
     return 0;
 }
 
-void writeThread(uint64_t maxCount){
+void writeThread(uint64_t maxCount,uint id){
     Message message;
     uint64_t count = 0;
     while(count < maxCount){
         message.send_t = timeSinceEpoc();
-        if(writer.write(message)) count++;
+        if(writer.write(message)) {
+            count++;
+
+            if(count % 10000 == 0) {
+                cout<<"Writer-"<<id<<" writing... "<<count<< endl;
+            }
+        }
         this_thread::sleep_for(chrono::nanoseconds(1));
     }
     totalCount += count;
