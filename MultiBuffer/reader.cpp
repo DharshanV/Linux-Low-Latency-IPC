@@ -66,8 +66,9 @@ void readThread(uint id){
 
 void validateArguments(int argc, char* argv[]){
     if(argc != 2) { 
-        cout<<"Invalid argc"<<endl; exit(EXIT_FAILURE);
-        return;
+        cout<<"Invalid argc"<<endl;
+        cout<<"./multiReader <number of readers>"<<endl;
+        exit(EXIT_FAILURE);
     }
     try { 
         threadCount = stoi(argv[1]);

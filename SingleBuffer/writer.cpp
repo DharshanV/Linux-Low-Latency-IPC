@@ -51,7 +51,11 @@ void writeThread(uint64_t maxCount,uint id){
 }
 
 void validateArguments(int argc, char* argv[]){
-    if(argc != 3) { cout<<"Invalid argc"<<endl; exit(EXIT_FAILURE); }
+    if(argc != 3) { 
+        cout<<"Invalid argc"<<endl;
+        cout<<"./singleWriter <number of messages> <number of writers>"<<endl;
+        exit(EXIT_FAILURE); 
+    }
     try { 
         maxMessage = stoul(argv[1]);
         threadCount = stoi(argv[2]);

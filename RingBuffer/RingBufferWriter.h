@@ -19,7 +19,7 @@ public:
 
         //open the shared memory created by reader
         shmID = shm_open(memoryName.c_str(), O_RDWR, 0666);
-        check(shmID < 0, "shm_open");
+        check(shmID < 0, "Shared Memory not open. Launch reader first.");
 
         //Create and get the shared memeory pointer
         ftruncate(shmID,sizeof(struct MessageBuffer));
